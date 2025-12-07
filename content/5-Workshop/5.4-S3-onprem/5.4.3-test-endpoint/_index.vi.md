@@ -1,6 +1,6 @@
 ---
 title : "Kiểm Tra Kết Nối Interface Endpoint từ On-Premises"
-date : "`r Sys.Date()`"
+date: 2024-01-01T00:00:00+07:00
 weight : 3
 chapter : false
 pre : " <b> 5.4.3 </b> "

@@ -1,10 +1,13 @@
 ---
 title: "Worklog Tuần 9"
-date: "`r Sys.Date()`"
-weight: 1
+date: 2024-01-01T00:00:00+07:00
+weight: 9
 chapter: false
 pre: " <b> 1.9. </b> "
 ---
+{{% notice warning %}} 
+⚠️ **Lưu ý:** Thông tin dưới đây chỉ để tham khảo. Vui lòng **không sao chép nguyên văn** cho báo cáo của bạn, bao gồm cả cảnh báo này.
+{{% /notice %}}
 
 ### Mục tiêu tuần 9:
 
