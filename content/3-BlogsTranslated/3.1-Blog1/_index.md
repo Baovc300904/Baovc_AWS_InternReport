@@ -1,6 +1,5 @@
 ---
 title: "Blog 1"
-date: "`r Sys.Date()`"
 weight: 1
 chapter: false
 pre: " <b> 3.1. </b> "
@@ -9,118 +8,79 @@ pre: " <b> 3.1. </b> "
 ⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your report, including this warning.
 {{% /notice %}}
 
-# Getting Started with Healthcare Data Lakes: Using Microservices
+# Exploring the latest features of the Amazon Q Developer CLI
 
-Data lakes can help hospitals and healthcare facilities turn data into business insights, maintain business continuity, and protect patient privacy. A **data lake** is a centralized, managed, and secure repository to store all your data, both in its raw and processed forms for analysis. Data lakes allow you to break down data silos and combine different types of analytics to gain insights and make better business decisions.
+**by Brian Beach on 20 MAY 2025 in Amazon Q Developer, Announcements**
 
-This blog post is part of a larger series on getting started with setting up a healthcare data lake. In my final post of the series, *“Getting Started with Healthcare Data Lakes: Diving into Amazon Cognito”*, I focused on the specifics of using Amazon Cognito and Attribute Based Access Control (ABAC) to authenticate and authorize users in the healthcare data lake solution. In this blog, I detail how the solution evolved at a foundational level, including the design decisions I made and the additional features used. You can access the code samples for the solution in this Git repo for reference.
+It's been a few weeks since my last post about the Amazon Q Developer Command Line Interface (CLI), and I'm excited to share all the great new features and improvements the team has been working on. The CLI has been evolving rapidly with a focus on enhancing user experience, improving context management, and adding powerful new capabilities. In this post, I'll walk you through the most significant changes that make the Amazon Q Developer CLI even more powerful and user-friendly.
 
----
+## Conversation Persistence
 
-## Architecture Guidance
+One of the most requested features has been the ability to persist conversations, and I'm thrilled to share that this is now available. With the new `q chat --resume` command, your conversations are now automatically saved by a working directory. This means you can pick up right where you left off when you return to a project, without having to rebuild context or repeat information.
 
-The main change since the last presentation of the overall architecture is the decomposition of a single service into a set of smaller services to improve maintainability and flexibility. Integrating a large volume of diverse healthcare data often requires specialized connectors for each format; by keeping them encapsulated separately as microservices, we can add, remove, and modify each connector without affecting the others. The microservices are loosely coupled via publish/subscribe messaging centered in what I call the “pub/sub hub.”
+Q Developer has also added two new commands to give you more control over your conversation state:
 
-This solution represents what I would consider another reasonable sprint iteration from my last post. The scope is still limited to the ingestion and basic parsing of **HL7v2 messages** formatted in **Encoding Rules 7 (ER7)** through a REST interface.
+- `/save` allows you to explicitly save the current conversation state
+- `/load` lets you restore a previously saved conversation
 
-**The solution architecture is now as follows:**
+These commands make it easier to manage multiple conversation threads related to different aspects of your project. You can save a conversation about one feature, switch to working on something else, and then load the previous conversation when you're ready to continue.
 
-> *Figure 1. Overall architecture; colored boxes represent distinct services.*
+## MCP and Tool Use Enhancements
 
----
+The Model Context Protocol (MCP) is a key part of the Amazon Q Developer CLI, allowing for extensibility through additional tools and servers. Q Developer has made several improvements to how MCP servers are loaded and managed:
 
-While the term *microservices* has some inherent ambiguity, certain traits are common:  
-- Small, autonomous, loosely coupled  
-- Reusable, communicating through well-defined interfaces  
-- Specialized to do one thing well  
-- Often implemented in an **event-driven architecture**
+First, Q Developer has implemented background MCP server loading, which significantly improves startup time for `q chat`. Instead of waiting for all MCP servers to initialize before you can start interacting with Q Developer, the CLI now loads servers in the background while you begin your conversation. This means you can start working immediately, with tools becoming available as their servers finish loading.
 
-When determining where to draw boundaries between microservices, consider:  
-- **Intrinsic**: technology used, performance, reliability, scalability  
-- **Extrinsic**: dependent functionality, rate of change, reusability  
-- **Human**: team ownership, managing *cognitive load*
+The team has also added a new subcommand, `q mcp`, which provides a dedicated interface for updating and managing your MCP server configuration. This makes it easier to add, remove, or modify the MCP servers that extend your CLI's capabilities.
 
----
+For more granular control over which tools can be used, Q Developer has added the `/tools` command in `q chat`. This allows you to manage permissions for individual tools, giving you more control over what Q Developer can do in your environment. You can also reset permissions for a specific tool if you change your mind.
 
-## Technology Choices and Communication Scope
+## Improved Context Control
 
-| Communication scope                       | Technologies / patterns to consider                                                        |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Within a single microservice              | Amazon Simple Queue Service (Amazon SQS), AWS Step Functions                               |
-| Between microservices in a single service | AWS CloudFormation cross-stack references, Amazon Simple Notification Service (Amazon SNS) |
-| Between services                          | Amazon EventBridge, AWS Cloud Map, Amazon API Gateway                                      |
+Context is crucial for getting the most out of Q Developer, and the team has made several improvements to how you can manage and view context:
 
----
+The file selection in `q chat`'s fuzzy finder is now git-aware, making it easier to include relevant files from your repository. This is particularly useful when working with large codebases, as it helps you focus on the files that matter for your current task.
 
-## The Pub/Sub Hub
+Q Developer has added fuzzy search for slash commands with `Ctrl + s`, allowing you to quickly find and execute commands without remembering their exact syntax. This makes the CLI more accessible, especially for new users or those who don't use certain commands frequently.
 
-Using a **hub-and-spoke** architecture (or message broker) works well with a small number of tightly related microservices.  
-- Each microservice depends only on the *hub*  
-- Inter-microservice connections are limited to the contents of the published message  
-- Reduces the number of synchronous calls since pub/sub is a one-way asynchronous *push*
+The `/context show --expand` command has been improved to provide more detailed information about the current context, helping you understand what Q Developer knows about your environment. The team has also enhanced the context file display in `q chat` to make it more informative and easier to read.
 
-Drawback: **coordination and monitoring** are needed to avoid microservices processing the wrong message.
+One of the most exciting additions is the new capability for dynamically adding context to messages with context hooks. This allows the CLI to automatically include relevant context based on your conversation, improving the quality of responses without requiring manual context management.
 
----
+## Context Window Awareness and Optimization
 
-## Core Microservice
+As conversations grow longer, managing the context window becomes increasingly important. Q Developer has added two new commands to help with this:
 
-Provides foundational data and communication layer, including:  
-- **Amazon S3** bucket for data  
-- **Amazon DynamoDB** for data catalog  
-- **AWS Lambda** to write messages into the data lake and catalog  
-- **Amazon SNS** topic as the *hub*  
-- **Amazon S3** bucket for artifacts such as Lambda code
+- `/usage` displays an estimate of the context window usage, helping you understand how much of the available context space you're using
+- `/compact` summarizes the conversation history, allowing you to reduce the size of the context while preserving the important information
 
-> Only allow indirect write access to the data lake through a Lambda function → ensures consistency.
+These tools help you make the most of the available context window, ensuring that Q Developer has access to the most relevant information without running into token limits.
 
----
+## Image Support
 
-## Front Door Microservice
+I'm particularly excited to announce that `q chat` now supports images! This opens up a whole new dimension of interaction, allowing you to share screenshots, diagrams, or other visual information with Q Developer. This can be incredibly useful for debugging UI issues, discussing design concepts, or explaining complex ideas that are difficult to convey through text alone.
 
-- Provides an API Gateway for external REST interaction  
-- Authentication & authorization based on **OIDC** via **Amazon Cognito**  
-- Self-managed *deduplication* mechanism using DynamoDB instead of SNS FIFO because:  
-  1. SNS deduplication TTL is only 5 minutes  
-  2. SNS FIFO requires SQS FIFO  
-  3. Ability to proactively notify the sender that the message is a duplicate  
+## Editor for Long Prompts
 
----
+For complex queries or detailed instructions, you may want multiple paragraphs. Q Developer supports `Ctrl + j`, allowing you to add a newline character to the prompt. In addition, the team has added the `/editor` command, which opens your configured text editor for composing prompts. This makes it much easier to craft detailed, multi-paragraph prompts or to edit and refine your questions before sending them to Q Developer.
 
-## Staging ER7 Microservice
+## Expanded Region Support
 
-- Lambda “trigger” subscribed to the pub/sub hub, filtering messages by attribute  
-- Step Functions Express Workflow to convert ER7 → JSON  
-- Two Lambdas:  
-  1. Fix ER7 formatting (newline, carriage return)  
-  2. Parsing logic  
-- Result or error is pushed back into the pub/sub hub  
+I'm happy to announce that Q Developer has expanded its regional availability. Professional tier users can now access Q Developer in the Frankfurt region (eu-central-1). This expansion is part of Q Developer's ongoing effort to provide lower latency and better service to customers across the globe. By adding support for the Frankfurt region, Amazon Q Developer is more accessible to European customers, allowing them to benefit from reduced latency and improved performance.
 
----
+## Ability to Manage Issues in CLI
 
-## New Features in the Solution
+Amazon Q Developer has made it easier to report issues directly from the CLI with two new features:
 
-### 1. AWS CloudFormation Cross-Stack References
-Example *outputs* in the core microservice:
-```yaml
-Outputs:
-  Bucket:
-    Value: !Ref Bucket
-    Export:
-      Name: !Sub ${AWS::StackName}-Bucket
-  ArtifactBucket:
-    Value: !Ref ArtifactBucket
-    Export:
-      Name: !Sub ${AWS::StackName}-ArtifactBucket
-  Topic:
-    Value: !Ref Topic
-    Export:
-      Name: !Sub ${AWS::StackName}-Topic
-  Catalog:
-    Value: !Ref Catalog
-    Export:
-      Name: !Sub ${AWS::StackName}-Catalog
-  CatalogArn:
-    Value: !GetAtt Catalog.Arn
-    Export:
-      Name: !Sub ${AWS::StackName}-CatalogArn
+- The `/issue` command in `q chat` allows you to create new GitHub issues
+- The `report_issue` tool provides a programmatic way for Q Developer to help you create detailed issue reports
+
+These features streamline the feedback process, making it easier for you to report bugs or request features, and for the team to improve the CLI based on your input.
+
+## Keeping Up with Future Changes
+
+To help you stay informed about new features and improvements, Q Developer has added a `--changelog` flag to the `q version` command. This displays the change log directly from the CLI, making it easy to see what's new without having to visit the GitHub repository or read blog posts like this one.
+
+## Conclusion
+
+The Amazon Q Developer CLI continues to evolve rapidly, with new features and improvements that make it an even more powerful tool for developers. From conversation persistence to image support, these updates reflect Q Developer's commitment to building a CLI that helps you be more productive and effective in your daily work. I encourage you to try out these new features by installing the Amazon Q Developer CLI. Thank you for your continued support and feedback, which helps make Amazon Q Developer better every day.

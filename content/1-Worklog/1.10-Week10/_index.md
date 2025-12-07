@@ -1,6 +1,5 @@
 ---
 title: "Week 10 Worklog"
-date: "`r Sys.Date()`"
 weight: 2
 chapter: false
 pre: " <b> 1.10. </b> "
@@ -12,46 +11,53 @@ pre: " <b> 1.10. </b> "
 
 ### Week 10 Objectives:
 
-* Connect and get acquainted with members of First Cloud Journey.
-* Understand basic AWS services, how to use the console & CLI.
+* Learn about AWS security best practices.
+* Understand monitoring and compliance tools.
+* Practice implementing security controls.
 
 ### Tasks to be carried out this week:
 | Day | Task                                                                                                                                                                                                   | Start Date | Completion Date | Reference Material                        |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | --------------- | ----------------------------------------- |
-| 2   | - Get acquainted with FCJ members <br> - Read and take note of internship unit rules and regulations                                                                                                   | 08/11/2025 | 08/11/2025      |
-| 3   | - Learn about AWS and its types of services <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                              | 08/12/2025 | 08/12/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Create AWS Free Tier account <br> - Learn about AWS Console & AWS CLI <br> - **Practice:** <br>&emsp; + Create AWS account <br>&emsp; + Install & configure AWS CLI <br> &emsp; + How to use AWS CLI | 08/13/2025 | 08/13/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Learn basic EC2: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - SSH connection methods to EC2 <br> - Learn about Elastic IP   <br>                            | 08/14/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Practice:** <br>&emsp; + Launch an EC2 instance <br>&emsp; + Connect via SSH <br>&emsp; + Attach an EBS volume                                                                                     | 08/15/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| 2   | - Overview of AI/ML on AWS <br> - Learn about ML support services: SageMaker, Rekognition, Comprehend, Kendra, Translate, Polly                                                                                                              | 10/11/2025 | 10/11/2025      | AWS Journey               |
+| 3   | - Practice with Amazon SageMaker: <br>&emsp; + Create Notebook Instance <br>&emsp; + Train simple models (Linear Regression / Image Classification) <br>&emsp; + Deploy endpoint and test predictions                                                                                      | 11/11/2025 | 11/11/2025      | AWS Journey                     |
+| 4   | - Get familiar with Amazon Rekognition <br> - Demo face and object recognition in images/videos <br> - Integrate Rekognition API into a small web application                                                                                | 12/11/2025 | 12/11/2025      | AWS Journey                 |
+| 5   | - Practice Amazon Comprehend (natural language processing) <br> - Experiment with Amazon Kendra (contextual intelligent search) <br> - Compare advantages and limitations of each service                                                                             | 13/11/2025 | 13/11/2025      | AWS Journey               |
+| 6   | - Summarize Week 10 knowledge: <br>&emsp; + AI/ML model development process on AWS <br>&emsp; + Real-world applications of AI/ML in business <br>&emsp; + Write practice results report and expansion directions                                        | 14/11/2025 | 14/11/2025      | AWS Journey                            |
 
 
 ### Week 10 Achievements:
 
-* Understood what AWS is and mastered the basic service groups: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
+* Learned about AWS security:
+  * Understood shared responsibility model
+  * Reviewed AWS security best practices
+  * Studied security pillar of Well-Architected Framework
 
-* Successfully created and configured an AWS Free Tier account.
+* Worked with AWS CloudTrail:
+  * Enabled CloudTrail in AWS account
+  * Configured trail to log to S3 bucket
+  * Reviewed API call history
+  * Viewed events in CloudTrail console
+  * Understood log file format
 
-* Became familiar with the AWS Management Console and learned how to find, access, and use services via the web interface.
+* Practiced with AWS Config:
+  * Enabled AWS Config service
+  * Set up Config rules for compliance:
+    * Check for encrypted EBS volumes
+    * Verify S3 bucket versioning
+    * Check IAM password policy
+  * Reviewed compliance dashboard
+  * Viewed non-compliant resources
 
-* Installed and configured AWS CLI on the computer, including:
-  * Access Key
-  * Secret Key
-  * Default Region
-  * ...
+* Used AWS GuardDuty:
+  * Enabled GuardDuty for threat detection
+  * Reviewed finding types
+  * Viewed sample findings
+  * Understood severity levels (Low, Medium, High)
+  * Learned about common threats detected
 
-* Used AWS CLI to perform basic operations such as:
-
-  * Check account & configuration information
-  * Retrieve the list of regions
-  * View EC2 service
-  * Create and manage key pairs
-  * Check information about running services
-  * ...
-
-* Acquired the ability to connect between the web interface and CLI to manage AWS resources in parallel.
-* ...
+* Explored AWS Security Hub:
+  * Enabled Security Hub
+  * Viewed consolidated security findings
+  * Reviewed security scores
+  * Understood integration with GuardDuty and Config
+  * Exported findings report

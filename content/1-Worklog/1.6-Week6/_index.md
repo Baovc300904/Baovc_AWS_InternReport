@@ -1,6 +1,5 @@
 ---
 title: "Week 6 Worklog"
-date: "`r Sys.Date()`"
 weight: 1
 chapter: false
 pre: " <b> 1.6. </b> "
@@ -12,46 +11,49 @@ pre: " <b> 1.6. </b> "
 
 ### Week 6 Objectives:
 
-* Connect and get acquainted with members of First Cloud Journey.
-* Understand basic AWS services, how to use the console & CLI.
+* Learn about monitoring and logging with CloudWatch.
+* Understand Auto Scaling for automatic scaling resources.
+* Study cost optimization and billing management.
 
 ### Tasks to be carried out this week:
 | Day | Task                                                                                                                                                                                                   | Start Date | Completion Date | Reference Material                        |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | --------------- | ----------------------------------------- |
-| 2   | - Get acquainted with FCJ members <br> - Read and take note of internship unit rules and regulations                                                                                                   | 08/11/2025 | 08/11/2025      |
-| 3   | - Learn about AWS and its types of services <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                              | 08/12/2025 | 08/12/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Create AWS Free Tier account <br> - Learn about AWS Console & AWS CLI <br> - **Practice:** <br>&emsp; + Create AWS account <br>&emsp; + Install & configure AWS CLI <br> &emsp; + How to use AWS CLI | 08/13/2025 | 08/13/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Learn basic EC2: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - SSH connection methods to EC2 <br> - Learn about Elastic IP   <br>                            | 08/14/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Practice:** <br>&emsp; + Launch an EC2 instance <br>&emsp; + Connect via SSH <br>&emsp; + Attach an EBS volume                                                                                     | 08/15/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| 2   | - Review basic IAM knowledge <br> - Learn advanced IAM Policy (JSON structure, Effect, Action, Resource, Condition) <br> - Create custom policies and attach to users/groups                                                                                             | 13/10/2025 | 13/10/2025      | AWS Journey                              |
+| 3   | - Introduction to AWS Key Management Service (KMS) <br> - Create a Customer Managed Key (CMK) and test file encryption/decryption <br> - Apply KMS to encrypt an S3 bucket or an EBS volume                                                           | 14/10/2025 | 14/10/2025      | AWS Journey |
+| 4   | - Get familiar with AWS Secrets Manager <br> - Create a secret to store Database connection information <br> - Write a small Lambda script to read the secret from Secrets Manager                                                          | 15/10/2025 | 15/10/2025      | AWS Journey                  |
+| 5   | - Explore AWS Billing Dashboard and Cost Explorer <br> - View costs by service, region, and time period <br> - Set up Cost Anomaly Detection                                                           | 16/10/2025 | 16/10/2025      | AWS Journey                                   |
+| 6   | - Create an AWS Budget and configure cost alerts via email <br> - Write a weekly cost summary report with optimization proposals (stop EC2, cleanup EBS, reduce log retention, etc.) <br> - Wrap up Week 6 learnings                                            | 17/10/2025 | 17/10/2025      | AWS Journey                               |
 
 
 ### Week 6 Achievements:
 
-* Understood what AWS is and mastered the basic service groups: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
+* Learned about CloudWatch monitoring:
+  * Understood CloudWatch metrics for AWS services
+  * Learned how to view and analyze metrics
+  * Studied CloudWatch dashboards for visualization
 
-* Successfully created and configured an AWS Free Tier account.
+* Created CloudWatch alarms:
+  * Set up alarm for EC2 CPU utilization > 80%
+  * Configured SNS topic for email notifications
+  * Tested alarm by increasing CPU load
+  * Viewed CloudWatch Logs for Lambda executions
 
-* Became familiar with the AWS Management Console and learned how to find, access, and use services via the web interface.
+* Understood Auto Scaling concepts:
+  * Learned benefits of automatic scaling
+  * Studied Auto Scaling Groups components
+  * Understood scaling policies:
+    * Target tracking (maintain metric at target)
+    * Step scaling (scale based on thresholds)
 
-* Installed and configured AWS CLI on the computer, including:
-  * Access Key
-  * Secret Key
-  * Default Region
-  * ...
+* Practiced with Auto Scaling:
+  * Created Launch Template for EC2 instances
+  * Set up Auto Scaling Group (min: 2, max: 5)
+  * Configured scaling policy based on CPU
+  * Generated load to test automatic scaling
+  * Observed instances launching and terminating
 
-* Used AWS CLI to perform basic operations such as:
-
-  * Check account & configuration information
-  * Retrieve the list of regions
-  * View EC2 service
-  * Create and manage key pairs
-  * Check information about running services
-  * ...
-
-* Acquired the ability to connect between the web interface and CLI to manage AWS resources in parallel.
-* ...
+* Learned about AWS billing:
+  * Explored AWS Billing Dashboard
+  * Set up billing alerts for cost threshold
+  * Reviewed Cost Explorer for spending patterns
+  * Learned about cost allocation tags

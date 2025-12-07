@@ -1,6 +1,5 @@
 ---
 title: "Week 5 Worklog"
-date: "`r Sys.Date()`"
 weight: 1
 chapter: false
 pre: " <b> 1.5. </b> "
@@ -12,46 +11,51 @@ pre: " <b> 1.5. </b> "
 
 ### Week 5 Objectives:
 
-* Connect and get acquainted with members of First Cloud Journey.
-* Understand basic AWS services, how to use the console & CLI.
+* Learn about container services on AWS.
+* Understand ECS and basic Docker concepts.
+* Study Load Balancer for distributing traffic.
 
 ### Tasks to be carried out this week:
 | Day | Task                                                                                                                                                                                                   | Start Date | Completion Date | Reference Material                        |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | --------------- | ----------------------------------------- |
-| 2   | - Get acquainted with FCJ members <br> - Read and take note of internship unit rules and regulations                                                                                                   | 08/11/2025 | 08/11/2025      |
-| 3   | - Learn about AWS and its types of services <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                              | 08/12/2025 | 08/12/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Create AWS Free Tier account <br> - Learn about AWS Console & AWS CLI <br> - **Practice:** <br>&emsp; + Create AWS account <br>&emsp; + Install & configure AWS CLI <br> &emsp; + How to use AWS CLI | 08/13/2025 | 08/13/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Learn basic EC2: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - SSH connection methods to EC2 <br> - Learn about Elastic IP   <br>                            | 08/14/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Practice:** <br>&emsp; + Launch an EC2 instance <br>&emsp; + Connect via SSH <br>&emsp; + Attach an EBS volume                                                                                     | 08/15/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| 2   | - Introduction to Infrastructure as Code (IaC) concepts and benefits compared to manual deployment <br> - Get familiar with AWS CloudFormation: template, stack, parameter                                                                                                   | 06/10/2025 | 06/10/2025      | AWS Journey |
+| 3   | - Write CloudFormation template to deploy S3 bucket and EC2 instance <br> - Create, update, and delete stack via AWS Console                                              | 07/10/2025 | 07/10/2025      | AWS Journey |
+| 4   | - Introduction to AWS CDK (Cloud Development Kit) <br> - Install AWS CDK, create CDK project using Python or TypeScript <br> - Write CDK code to deploy EC2 instance | 08/10/2025 | 08/10/2025      | AWS Journey |
+| 5   | - Introduction to AWS Systems Manager (SSM) and key features: Parameter Store, Run Command, Automation, Session Manager <br> - Create Parameter Store to store configuration variables   <br>                            | 09/10/2025 | 09/10/2025      | AWS Journey |
+| 6   | - Practice creating Automation Document in SSM to automatically start/stop EC2 <br> - Test Session Manager (access EC2 without SSH key) <br> - Week summary: IaC + SSM demo                                                                                     | 10/10/2025 | 10/10/2025      | AWS Journey |
 
 
 ### Week 5 Achievements:
 
-* Understood what AWS is and mastered the basic service groups: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
+* Learned about containerization and Docker:
+  * Understood benefits of containers
+  * Learned difference between containers and VMs
+  * Studied Docker images and containers
 
-* Successfully created and configured an AWS Free Tier account.
+* Practiced with Docker locally:
+  * Installed Docker Desktop
+  * Pulled images from Docker Hub
+  * Ran basic containers:
+    * `docker pull nginx`
+    * `docker run -d -p 80:80 nginx`
+  * Learned basic Docker commands
 
-* Became familiar with the AWS Management Console and learned how to find, access, and use services via the web interface.
+* Understood Amazon ECS:
+  * Learned ECS as managed container service
+  * Studied ECS components:
+    * Clusters
+    * Task definitions
+    * Services
+  * Compared Fargate (serverless) vs EC2 launch types
 
-* Installed and configured AWS CLI on the computer, including:
-  * Access Key
-  * Secret Key
-  * Default Region
-  * ...
+* Deployed application on ECS:
+  * Created ECS cluster
+  * Created task definition with simple web app
+  * Deployed service on Fargate
+  * Viewed container logs in CloudWatch
 
-* Used AWS CLI to perform basic operations such as:
-
-  * Check account & configuration information
-  * Retrieve the list of regions
-  * View EC2 service
-  * Create and manage key pairs
-  * Check information about running services
-  * ...
-
-* Acquired the ability to connect between the web interface and CLI to manage AWS resources in parallel.
-* ...
+* Worked with Application Load Balancer:
+  * Created ALB for distributing traffic
+  * Configured target groups
+  * Integrated ALB with ECS service
+  * Tested load balancing with multiple tasks

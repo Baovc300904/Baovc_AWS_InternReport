@@ -12,48 +12,58 @@ pre: " <b> 1.11. </b> "
 
 ### Mục tiêu tuần 11:
 
-* Kết nối, làm quen với các thành viên trong First Cloud Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+* Tìm hiểu về các khái niệm Modernization và Serverless.
+* Hiểu về kiến trúc monolithic và microservices.
+* Thực hành xây dựng ứng dụng serverless với Lambda, API Gateway và các dịch vụ AWS khác.
 
 ### Các công việc cần triển khai trong tuần này:
 | Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- | ----------------------------------------- |
-| 2   | - Làm quen với các thành viên FCJ <br> - Đọc và lưu ý các nội quy, quy định tại đơn vị thực tập                                                                                             | 11/08/2025   | 11/08/2025      |
-| 3   | - Tìm hiểu AWS và các loại dịch vụ <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                            | 12/08/2025   | 12/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Tạo AWS Free Tier account <br> - Tìm hiểu AWS Console & AWS CLI <br> - **Thực hành:** <br>&emsp; + Tạo AWS account <br>&emsp; + Cài AWS CLI & cấu hình <br> &emsp; + Cách sử dụng AWS CLI | 13/08/2025   | 13/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Tìm hiểu EC2 cơ bản: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - Các cách remote SSH vào EC2 <br> - Tìm hiểu Elastic IP   <br>                  | 14/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Thực hành:** <br>&emsp; + Tạo EC2 instance <br>&emsp; + Kết nối SSH <br>&emsp; + Gắn EBS volume                                                                                         | 15/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| 2   | - Giới thiệu về các khái niệm Modernization và Serverless <br> - So sánh kiến trúc monolithic và microservices <br> - Phân tích lợi ích của việc chuyển đổi sang serverless                                                                                             | 17/11/2025   | 17/11/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| 3   | - Thực hành AWS Lambda: tạo function, cấu hình trigger, xem log trong CloudWatch <br> - Triển khai logic xử lý API cơ bản sử dụng Lambda                                                           | 18/11/2025   | 18/11/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| 4   | - Tích hợp API Gateway với Lambda để tạo REST API <br> - Kết nối dữ liệu với DynamoDB (các thao tác CRUD) <br> - Kiểm tra API bằng Postman                                                           | 19/11/2025   | 19/11/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| 5   | - Cấu hình Cognito để xác thực người dùng (user pool, token) <br> - Tích hợp xác thực Cognito vào API Gateway <br> - Quản lý quyền truy cập thông qua IAM Role                                                           | 20/11/2025   | 20/11/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| 6   | - Thực hành triển khai ứng dụng Serverless hoàn chỉnh bằng AWS SAM (Serverless Application Model) <br> - Testing, logging và tối ưu hóa hiệu suất <br> - Tổng hợp kiến thức và báo cáo tuần                                                           | 21/11/2025   | 21/11/2025      | <https://cloudjourney.awsstudygroup.com/> |
+
 
 
 ### Kết quả đạt được tuần 11:
 
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
+* Hiểu về Kiến trúc Serverless:
+  * Tìm hiểu các khái niệm và lợi ích của serverless
+  * So sánh kiến trúc monolithic và microservices
+  * Nghiên cứu ưu điểm của serverless:
+    * Không cần quản lý server
+    * Tự động mở rộng quy mô
+    * Tính phí theo mức sử dụng
+    * Thời gian đưa sản phẩm ra thị trường nhanh hơn
 
-* Đã tạo và cấu hình AWS Free Tier account thành công.
+* Thực hành AWS Lambda:
+  * Tạo Lambda function sử dụng Python
+  * Cấu hình trigger cho function (API Gateway, S3, CloudWatch Events)
+  * Xem execution log trong CloudWatch
+  * Thiết lập biến môi trường và timeout
+  * Triển khai logic xử lý API cơ bản
 
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
+* Xây dựng REST API với API Gateway và Lambda:
+  * Tạo REST API sử dụng API Gateway
+  * Tích hợp Lambda function làm backend
+  * Thực hiện các thao tác CRUD với DynamoDB
+  * Kiểm tra API endpoint bằng Postman
+  * Cấu hình request/response mapping
 
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
+* Triển khai Xác thực với Cognito:
+  * Tạo Cognito User Pool
+  * Cấu hình luồng xác thực người dùng
+  * Tích hợp Cognito với API Gateway
+  * Sử dụng JWT token để ủy quyền
+  * Quản lý IAM role cho kiểm soát truy cập
 
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
+* Triển khai Ứng dụng Serverless:
+  * Tìm hiểu cơ bản về AWS SAM framework
+  * Tạo SAM template (template.yaml)
+  * Triển khai ứng dụng serverless hoàn chỉnh bằng SAM CLI
+  * Kiểm tra chức năng ứng dụng
+  * Xem lại CloudWatch log để giám sát
 
 
