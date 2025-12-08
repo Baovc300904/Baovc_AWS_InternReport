@@ -1,0 +1,608 @@
+AWS FIRST CLOUD AI JOURNEY – PROJECT PLAN
+DEVTERIA GAME STORE PLATFORM
+
+To create a professionally formatted Word document, follow these steps:
+
+=== COVER PAGE ===
+Title: AWS First Cloud AI Journey – Project Plan
+Subtitle: Devteria Team – First Cloud Journey – Devteria Game Store Platform  
+Date: December 8, 2025
+
+=== TABLE OF CONTENTS (Auto-generate in Word) ===
+1. BACKGROUND AND MOTIVATION
+   1.1 Executive Summary
+   1.2 Project Success Criteria
+   1.3 Assumptions
+2. SOLUTION ARCHITECTURE / ARCHITECTURAL DIAGRAM
+   2.1 Technical Architecture Diagram
+   2.2 Technical Plan
+   2.3 Project Plan
+   2.4 Security Considerations
+3. ACTIVITIES AND DELIVERABLES
+   3.1 Activities and Deliverables
+   3.2 Out of Scope
+   3.3 Path to Production
+4. EXPECTED AWS COST BREAKDOWN BY SERVICES
+5. TEAM
+6. RESOURCES & COST ESTIMATES
+7. ACCEPTANCE
+
+=== CONTENT ===
+
+1. BACKGROUND AND MOTIVATION
+
+1.1 EXECUTIVE SUMMARY
+
+Devteria Game Store is a scalable cloud-based e-commerce platform for digital game licensing and distribution. Built entirely on AWS infrastructure, it delivers secure user authentication, real-time inventory management, automated order processing, and global content delivery.
+
+The platform addresses critical challenges faced by traditional digital stores:
+• Traffic spike handling during sales events
+• Complex authentication processes reducing conversions
+• Manual inventory management causing overselling
+• Lack of real-time analytics and insights
+• High infrastructure costs for peak capacity planning
+
+Devteria leverages AWS services including:
+• CloudFront + S3 for fast global content delivery
+• Cognito for secure authentication with MFA
+• API Gateway + Lambda for serverless backend logic
+• RDS PostgreSQL + S3 for reliable data storage
+• SQS + SNS for asynchronous order processing
+• CodePipeline for continuous deployment
+
+The solution supports thousands of concurrent users with 99.9% uptime guarantee and achieves cost efficiency through serverless architecture that scales automatically based on demand.
+
+1.2 PROJECT SUCCESS CRITERIA
+
+• Achieve page load time of less than 2 seconds globally through CloudFront CDN
+• Maintain 99.9% system uptime using AWS managed services and Multi-AZ deployment
+• Handle 10x traffic spikes automatically through Lambda auto-scaling and EC2 Auto Scaling Groups
+• Ensure zero security breaches with Cognito MFA, IAM policies, and encryption at rest/transit
+• Complete CI/CD pipeline enabling deployments in less than 10 minutes via CodePipeline
+• Reduce cart abandonment by 40% through simplified Cognito authentication flow
+• Decrease infrastructure management time by 60% using serverless components
+• Maintain stable performance for 10,000 monthly active users with room to scale to 100K+
+• Ensure database consistency with RDS automated backups and point-in-time recovery (7-day retention)
+• Achieve PCI-ready security posture for payment processing integration
+
+1.3 ASSUMPTIONS
+
+• The customer will provide accurate business requirements and game licensing workflows
+• GitLab repository and credentials will be accessible for CI/CD integration
+• All workloads will operate within one AWS Region (us-east-1 or ap-southeast-1)
+• No on-premise system integration required during the initial phase
+• Frontend code (React/Next.js) supports static hosting via S3 + CloudFront
+• The project will not include Machine Learning or AI recommendation modules in Phase 1
+• Traffic is expected to remain within reasonable limits (10,000 users initially)
+• Payment gateway integration will use third-party APIs (Stripe/PayPal) via Lambda
+• Game files will be uploaded manually or via admin dashboard to S3
+• Customer accepts AWS Free Tier limitations and cost estimates provided
+
+2. SOLUTION ARCHITECTURE / ARCHITECTURAL DIAGRAM
+
+2.1 TECHNICAL ARCHITECTURE DIAGRAM
+
+The Devteria Game Store architecture consists of the following layers:
+
+1. Edge Networking Layer
+   • Route 53: DNS management and domain hosting
+   • CloudFront: Global CDN for caching static assets and reducing latency (<2s page load)
+   • AWS Shield: DDoS protection (Standard tier included)
+
+2. Application Layer
+   • Frontend: React/Next.js app hosted on S3 + CloudFront
+   • API Gateway: RESTful API entry point with request validation and throttling
+   • Lambda Functions: Serverless backend logic (authentication, catalog browsing, order processing)
+   • EC2 Auto Scaling Group: Microservices for complex business logic (2x t3.medium instances)
+   • Application Load Balancer: Distributes traffic to EC2 instances
+
+3. Data Layer
+   • RDS PostgreSQL Multi-AZ: User accounts, game catalog, orders, license keys
+   • S3 Buckets: Game installation files, promotional assets, static website hosting
+   • SQS: Message queue for asynchronous order processing and license generation
+   • SNS: Email notifications for order confirmations and promotions
+
+4. Networking Layer
+   • VPC: Isolated network environment (10.0.0.0/16)
+   • Public Subnets: ALB, NAT Gateway for internet access
+   • Private Subnets: EC2 instances, RDS database (no direct internet exposure)
+   • Internet Gateway: External access for public-facing resources
+
+5. CI/CD Layer
+   • GitLab: Source code repository with version control
+   • CodePipeline: Orchestrates automated build and deployment workflow
+   • CodeBuild: Compiles code, runs tests, creates deployment artifacts
+   • EC2 Deployment: Automated deployment to instances via CodeDeploy
+
+6. Security & Monitoring Layer
+   • Cognito: User authentication and authorization with MFA support
+   • IAM: Fine-grained access control with least privilege policies
+   • Secrets Manager: Secure storage for database credentials with automatic rotation
+   • CloudWatch: Metrics collection, logs aggregation, and alarms
+   • CloudTrail: API audit logging for compliance
+
+User Flow:
+User accesses site → Login via Cognito → Browse games (API Gateway → Lambda → RDS) → Add to cart → Checkout → Payment processing → License generation (SQS) → Email notification (SNS) → Secure download from S3
+
+Architecture diagram reference: /images/2-Proposal/proposal.jpg
+
+2.2 TECHNICAL PLAN
+
+The partner will implement the architecture using Infrastructure as Code (IaC) via AWS CloudFormation to ensure consistent, reproducible, and version-controlled deployments.
+
+CI/CD Pipeline Stages:
+• Source: GitLab webhook triggers CodePipeline on commit
+• Build: CodeBuild compiles React frontend and Node.js backend
+• Test: Automated unit tests, integration tests, and security scans
+• Deploy: Frontend to S3, Backend to EC2 via CodeDeploy with blue/green deployment
+
+Additional Technical Configurations:
+• IAM roles restricted following least-privilege model (separate roles for Lambda, EC2, RDS access)
+• RDS automated backups with 7-day retention and point-in-time recovery
+• CloudWatch alarms for CPU >80%, memory >85%, database connections >80%, API 5xx errors
+• S3 versioning enabled for rollback capability
+• Cognito user pool with strong password policies (min 8 chars, uppercase, lowercase, numbers, symbols)
+• Lambda provisioned concurrency to eliminate cold starts during peak hours
+
+Test Cases (to be documented in Appendix):
+• Authentication flows (signup, login, MFA, password reset)
+• API integration (catalog retrieval, order creation, payment processing)
+• Database failover testing (RDS Multi-AZ automatic failover)
+• Load testing scenarios (1000 concurrent users, 10x traffic spike)
+
+2.3 PROJECT PLAN
+
+The project follows an Agile Scrum framework across 6 months (24 weeks), organized into 12 sprints of 2 weeks each.
+
+Team Structure:
+• Project Manager: Overall coordination, stakeholder communication, risk management
+• Cloud Solutions Architect: Design AWS infrastructure, create IaC templates, technical leadership
+• Backend Developers (2): Build Lambda functions, EC2 microservices, API Gateway integration
+• Frontend Developer: Develop React/Next.js application, Cognito integration
+• DevOps Engineer: Set up CI/CD pipeline, monitoring, infrastructure automation
+• QA Engineer: Functional testing, performance testing, security testing
+
+Communication Cadence:
+• Daily standup: 15-minute team sync (blockers, progress, plans)
+• Weekly sprint planning: Review backlog, assign tasks, estimate effort
+• Bi-weekly sprint review: Demo completed features to stakeholders
+• Bi-weekly retrospective: Team improvement discussions
+• Monthly technical report: Progress update, metrics, risks to customer
+• Slack/Teams: Real-time collaboration and quick questions
+
+Stakeholder Engagement:
+• Product Owner, IT Lead, Project Supervisor join sprint reviews and retrospectives
+• Executive Sponsor receives monthly reports and attends milestone meetings
+
+Knowledge Transfer:
+• Documentation throughout project (architecture diagrams, runbooks, API docs)
+• Hands-on training sessions at project completion
+• Shadowing period for customer team during final 2 weeks
+
+2.4 SECURITY CONSIDERATIONS
+
+Access Control:
+• Cognito user pool with email verification and optional MFA (TOTP-based)
+• IAM roles with least privilege principle:
+  - Lambda execution role: RDS read/write, SQS send, SNS publish
+  - EC2 instance role: RDS read/write, S3 read
+  - Admin role: Full access with MFA enforcement
+• API Gateway request validation, throttling (1000 req/sec), and API keys for partners
+
+Infrastructure Security:
+• EC2 instances in private subnets (no direct internet access, only via NAT Gateway for updates)
+• Security Groups with minimal required ports:
+  - ALB: 443 (HTTPS), 80 (HTTP redirect to HTTPS)
+  - EC2: 8080 (from ALB only)
+  - RDS: 5432 (from EC2 and Lambda only)
+• Network ACLs for subnet-level traffic filtering
+• CloudFront with HTTPS-only, AWS Shield Standard for DDoS protection
+• AWS WAF (optional): Rate limiting, IP blacklisting, SQL injection protection
+
+Data Protection:
+• RDS encryption at rest using AWS KMS (AES-256)
+• S3 bucket encryption (SSE-S3) and versioning enabled
+• SSL/TLS for all data in transit (ACM-issued certificates)
+• Secrets Manager for database credentials with automatic 30-day rotation
+• Sensitive data (credit cards) not stored; handled by payment gateway APIs
+
+Detection & Response:
+• CloudTrail for API audit logging (all actions tracked, 90-day retention)
+• CloudWatch alarms for:
+  - Failed login attempts >5 in 5 minutes
+  - Unusual traffic patterns (>200% baseline)
+  - Database CPU >80%
+  - Lambda errors >1% error rate
+• SNS notifications for critical security events to security team email/SMS
+• Regular security audits (quarterly) and penetration testing (before launch)
+
+Incident Management:
+• Automated backup and restore procedures documented in runbooks
+• RDS automated backups with 7-day retention and point-in-time recovery
+• Disaster recovery plan: RTO < 4 hours, RPO < 1 hour
+• Incident response runbook for common scenarios:
+  - Database failover
+  - Application server failure
+  - DDoS attack
+  - Data breach
+
+3. ACTIVITIES AND DELIVERABLES
+
+3.1 ACTIVITIES AND DELIVERABLES
+
+Phase: Assessment
+Timeline: Week 1-2
+Activities: Requirements gathering, architecture design, ERD modeling, cost estimation, risk assessment
+Deliverables: Architecture document, project plan, ERD diagrams
+Man-days: 10
+
+Phase: Infrastructure Setup
+Timeline: Week 3-6
+Activities: VPC creation, subnets, IGW, NAT Gateway, RDS setup, S3 buckets, Cognito configuration
+Deliverables: AWS environment ready, networking configured, database initialized
+Man-days: 15
+
+Phase: Backend Development
+Timeline: Week 7-12
+Activities: Lambda function development (auth, catalog, orders), EC2 microservices, API Gateway integration, payment gateway integration
+Deliverables: Working APIs for authentication, catalog browsing, order processing
+Man-days: 25
+
+Phase: Frontend Development
+Timeline: Week 11-14
+Activities: React application development, Cognito integration, shopping cart, checkout flow, S3 + CloudFront deployment
+Deliverables: User-facing web application deployed
+Man-days: 18
+
+Phase: Integration & Advanced Features
+Timeline: Week 15-18
+Activities: Payment gateway integration, admin dashboard development, CI/CD pipeline setup (GitLab → CodePipeline → CodeBuild → Deploy)
+Deliverables: End-to-end workflow functional, automated deployment pipeline
+Man-days: 20
+
+Phase: Testing
+Timeline: Week 19-22
+Activities: Load testing (JMeter), security audits, penetration testing, UAT, bug fixes, performance tuning
+Deliverables: Test reports, security audit report, performance benchmarks
+Man-days: 15
+
+Phase: Launch & Handover
+Timeline: Week 23-24
+Activities: Beta release, monitoring setup, production deployment, knowledge transfer sessions, documentation handover
+Deliverables: Production system live, operations handbook, training materials
+Man-days: 7
+
+Total Man-days: 110
+
+3.2 OUT OF SCOPE
+
+The following items are excluded from the initial project scope and may be considered for Phase 2:
+
+• AI/ML recommendation engine for personalized game suggestions
+• Mobile application development (iOS/Android native apps)
+• Integration with external inventory management or ERP systems
+• Multi-region failover and disaster recovery setup (only single region in Phase 1)
+• Advanced analytics and business intelligence dashboards (beyond basic CloudWatch metrics)
+• Social media login integration (Google, Facebook) - only email/password via Cognito in Phase 1
+• Live chat customer support system
+• Advanced fraud detection beyond basic payment gateway features
+• Game streaming or cloud gaming capabilities
+• Marketplace features (user-to-user game trading, reselling)
+• Localization and multi-currency support (USD only in Phase 1)
+• Advanced SEO optimization and marketing automation
+
+3.3 PATH TO PRODUCTION
+
+The initial release (Phase 1 / MVP) includes core functionalities:
+• User registration and authentication via Cognito (email/password, email verification)
+• Game catalog browsing with search and filtering (by genre, price, release date)
+• Shopping cart and checkout workflow
+• Payment processing via Stripe/PayPal integration
+• Automated license key generation and delivery
+• Secure game file downloads from S3 with pre-signed URLs
+• Admin dashboard for inventory management (add/edit/delete games)
+• Basic reporting and analytics (sales, user registrations, popular games)
+
+To achieve production-ready status, the following enhancements are planned:
+• Enhanced error handling and user-friendly error messages (localized)
+• API rate limiting and request throttling via API Gateway (prevent abuse)
+• Database query optimization and indexing for high traffic (query execution <100ms)
+• Comprehensive audit trail dashboards in CloudWatch (user actions, admin changes)
+• Penetration testing by third-party security firm (OWASP Top 10 compliance)
+• Load testing to validate 10x traffic spike handling (baseline 1000 users → 10,000 users)
+• Customer acceptance testing (UAT) with 20-50 beta users for 2 weeks
+• Performance tuning based on UAT feedback
+• Final security review and compliance check
+• Go-live approval from stakeholders
+
+Production Readiness Checklist:
+☐ All critical bugs fixed (P0, P1)
+☐ Load testing passed (10x traffic spike)
+☐ Security audit passed (no critical/high vulnerabilities)
+☐ Backup and restore procedures tested
+☐ Monitoring and alerting configured
+☐ Documentation complete (architecture, runbooks, user guides)
+☐ Training completed for customer operations team
+☐ Go-live approval from Executive Sponsor
+
+4. EXPECTED AWS COST BREAKDOWN BY SERVICES
+
+Estimated monthly cost for 10,000 users and 1,000 orders/month: ~$228
+
+Service: CloudFront
+Configuration: 10M requests, 50GB data transfer
+Monthly Cost: $8
+
+Service: S3
+Configuration: 100GB storage, 10M GET requests
+Monthly Cost: $3
+
+Service: API Gateway
+Configuration: 1M REST API requests
+Monthly Cost: $3.50
+
+Service: Lambda
+Configuration: 5M invocations, 512MB memory, 3s avg duration
+Monthly Cost: $17.50
+
+Service: EC2
+Configuration: 2x t3.medium instances (4 vCPU, 8GB RAM), on-demand
+Monthly Cost: $60
+
+Service: RDS PostgreSQL
+Configuration: db.t3.small Multi-AZ (2 vCPU, 4GB RAM), 50GB storage
+Monthly Cost: $50
+
+Service: Application Load Balancer
+Configuration: 1 ALB, 1M LCU-hours
+Monthly Cost: $22
+
+Service: Cognito
+Configuration: 10,000 active users
+Monthly Cost: $28
+
+Service: SQS + SNS + CloudWatch + Secrets Manager + CodePipeline + Other
+Monthly Cost: $36
+
+Total Monthly Cost: ~$228
+Estimated Annual Cost: ~$2,736
+
+Scaling Projections:
+• 50,000 users: ~$650/month (~$7,800/year)
+• 100,000 users: ~$1,200/month (~$14,400/year)
+
+One-time Costs:
+• Development effort: $59,120 (see Section 6)
+• Domain registration (devteria.com): $15/year
+• SSL Certificate: Free (AWS Certificate Manager)
+• Third-party tools (monitoring, testing): $500
+
+Assumptions:
+• Traffic remains under 10,000 users/month initially
+• AWS Free Tier credits applied where eligible (first 12 months):
+  - Lambda: 1M requests/month free
+  - S3: 5GB storage, 20K GET requests free
+  - CloudFront: 1TB data transfer free (first year only)
+• Data transfer within same AWS region (no inter-region charges)
+• No Reserved Instances or Savings Plans in Phase 1 (will optimize in Phase 2 for 30-40% savings)
+
+Cost Optimization Opportunities (Phase 2):
+• Move to Reserved Instances for EC2 and RDS (save 30-40%)
+• Implement S3 Intelligent-Tiering for infrequent access files
+• Use CloudFront reserved capacity pricing
+• Optimize Lambda memory allocation based on profiling
+
+5. TEAM
+
+Partner Executive Sponsor
+Name: Nguyen Van A
+Title: Director of Cloud Services
+Description: Overall project accountability, strategic direction, budget approval
+Email/Contact: nguyenvana@devteria.com, +84-xxx-xxx-xxx
+
+Project Stakeholders
+
+Name: Tran Thi B
+Title: Product Manager
+Stakeholder for: Business requirements, UX/UI decisions, feature prioritization
+Email/Contact: tranthib@devteria.com
+
+Name: Le Van C
+Title: Senior QA Engineer
+Stakeholder for: Testing strategy, quality assurance, UAT coordination
+Email/Contact: levanc@devteria.com
+
+Name: Pham Thi D
+Title: IT Operations Manager
+Stakeholder for: Infrastructure deployment, production support, monitoring
+Email/Contact: phamthid@devteria.com
+
+Partner Project Team
+
+Name: Hoang Van E
+Title: Project Manager
+Role: Project coordination, stakeholder communication, risk management
+Email/Contact: hoangvane@partner.com
+
+Name: Nguyen Thi F
+Title: Cloud Solutions Architect
+Role: Architecture design, technical leadership, AWS best practices
+Email/Contact: nguyenthif@partner.com
+
+Name: Tran Van G
+Title: Senior Backend Developer
+Role: Lambda functions, EC2 microservices, API development
+Email/Contact: tranvang@partner.com
+
+Name: Pham Thi H
+Title: Frontend Developer
+Role: React application, Cognito integration, UI/UX implementation
+Email/Contact: phamthih@partner.com
+
+Name: Le Van I
+Title: DevOps Engineer
+Role: CI/CD pipeline, infrastructure automation, monitoring setup
+Email/Contact: levani@partner.com
+
+Name: Nguyen Van J
+Title: QA Engineer
+Role: Testing (functional, performance, security), bug tracking
+Email/Contact: nguyenvanj@partner.com
+
+Project Escalation Contacts
+
+Name: Hoang Van E
+Title: Project Manager
+Role: Primary escalation contact for project issues
+Email/Contact: hoangvane@partner.com
+
+Name: Nguyen Thi F
+Title: Cloud Solutions Architect
+Role: Technical escalation contact for architecture decisions
+Email/Contact: nguyenthif@partner.com
+
+6. RESOURCES & COST ESTIMATES
+
+Resource Rates:
+
+Resource: Solution Architects (1 headcount)
+Rate: $80/hour
+
+Resource: Engineers (4 headcount - 2 backend, 1 frontend, 1 DevOps)
+Rate: $60/hour
+
+Resource: Project Manager (1 headcount)
+Rate: $70/hour
+
+Resource: QA Engineer (1 headcount)
+Rate: $55/hour
+
+Project Phase Hours Breakdown:
+
+Phase: Assessment
+Solution Architects: 80 hours
+Engineers: 0 hours
+Project Manager: 0 hours
+QA Engineer: 0 hours
+Total Hours: 80 hours
+
+Phase: Infrastructure Setup
+Solution Architects: 120 hours
+Engineers: 0 hours
+Project Manager: 0 hours
+QA Engineer: 0 hours
+Total Hours: 120 hours
+
+Phase: Backend Development
+Solution Architects: 40 hours
+Engineers: 200 hours
+Project Manager: 0 hours
+QA Engineer: 0 hours
+Total Hours: 240 hours
+
+Phase: Frontend Development
+Solution Architects: 0 hours
+Engineers: 144 hours
+Project Manager: 0 hours
+QA Engineer: 0 hours
+Total Hours: 144 hours
+
+Phase: Integration & Advanced Features
+Solution Architects: 40 hours
+Engineers: 160 hours
+Project Manager: 0 hours
+QA Engineer: 0 hours
+Total Hours: 200 hours
+
+Phase: Testing
+Solution Architects: 20 hours
+Engineers: 0 hours
+Project Manager: 0 hours
+QA Engineer: 120 hours
+Total Hours: 140 hours
+
+Phase: Launch & Handover
+Solution Architects: 16 hours
+Engineers: 40 hours
+Project Manager: 0 hours
+QA Engineer: 0 hours
+Total Hours: 56 hours
+
+Total Hours:
+Solution Architects: 316 hours
+Engineers: 544 hours
+Project Manager: 0 hours
+QA Engineer: 120 hours
+Grand Total: 980 hours
+
+Total Cost Calculation:
+• Solution Architects: 316 hours × $80/hour = $25,280
+• Engineers: 544 hours × $60/hour = $32,640
+• QA Engineer: 120 hours × $55/hour = $6,600
+Total Project Cost: $64,520
+
+Cost Contribution Distribution:
+
+Party: Customer
+Contribution: $32,260
+% of Total: 50%
+
+Party: Partner
+Contribution: $25,808
+% of Total: 40%
+
+Party: AWS
+Contribution: $6,452
+% of Total: 10%
+
+Note: AWS contribution may come in the form of credits, promotional offers, or technical support resources.
+
+7. ACCEPTANCE
+
+Upon completion of each deliverable listed in Section 3.1, the partner will submit deliverables along with a formal Acceptance Form for customer review.
+
+Acceptance Process:
+1. Partner completes deliverable and internal quality checks
+2. Partner submits deliverable with Acceptance Form to customer
+3. Customer has 8 business days from submission date to review
+
+Customer Review Options:
+• Approve: Deliverable meets acceptance criteria, project proceeds to next phase
+• Reject: Deliverable does not meet criteria, partner receives detailed feedback specifying required changes
+
+Rejection Handling:
+• Partner corrects deliverable according to feedback
+• Partner resubmits for another review cycle (another 8 business days)
+• Process repeats until approval or escalation
+
+Auto-Acceptance:
+• If customer does not respond within 8-business-day acceptance period, deliverable is automatically accepted
+• Project proceeds to next phase
+• Auto-acceptance will be documented for audit trail
+
+Documentation:
+• All acceptances (explicit or auto) will be documented and signed by both parties
+• Maintains clear audit trail of project progress and completion milestones
+• Signatures required from:
+  - Customer: Executive Sponsor or designated Project Stakeholder
+  - Partner: Project Manager or Delivery Manager
+
+Acceptance Criteria (examples for each phase):
+• Architecture Document: Approved by customer's Cloud Architect and IT Lead
+• Infrastructure: Successfully deployed and accessible, meets performance benchmarks
+• APIs: Pass functional tests, meet response time SLA (<200ms average)
+• Frontend: UAT approval from Product Manager and 5 beta users
+• Testing: No critical/high bugs open, security audit passed
+• Production: Successful go-live with zero downtime, monitoring operational
+
+=== END OF DOCUMENT ===
+
+For best results in Word:
+1. Use Heading 1 for major sections (1, 2, 3...)
+2. Use Heading 2 for subsections (1.1, 1.2...)
+3. Use Heading 3 for sub-subsections (2.1.1, 2.2.1...)
+4. Apply built-in table styles (Grid Table 4 - Accent 1)
+5. Use bullet points for lists
+6. Page breaks before each major section
+7. Add page numbers in footer
+8. Insert Table of Contents (References → Table of Contents → Automatic)
