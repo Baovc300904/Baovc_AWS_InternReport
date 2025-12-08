@@ -1,5 +1,6 @@
 ---
 title: "Week 10 Worklog"
+date: 2024-01-01T00:00:00+07:00
 weight: 10
 chapter: false
 pre: " <b> 1.10. </b> "
@@ -11,9 +12,9 @@ pre: " <b> 1.10. </b> "
 
 ### Week 10 Objectives:
 
-* Learn about AWS security best practices.
-* Understand monitoring and compliance tools.
-* Practice implementing security controls.
+* Learn about AI/ML services on AWS.
+* Understand machine learning workflow using AWS services.
+* Practice building and deploying ML models with SageMaker and other AI services.
 
 ### Tasks to be carried out this week:
 | Day | Task                                                                                                                                                                                                   | Start Date | Completion Date | Reference Material                        |
@@ -27,26 +28,31 @@ pre: " <b> 1.10. </b> "
 
 ### Week 10 Achievements:
 
-* Learned about AWS security:
-  * Understood shared responsibility model
-  * Reviewed AWS security best practices
-  * Studied security pillar of Well-Architected Framework
+* Learned about AI/ML on AWS:
+  * Understood machine learning concepts and workflow
+  * Reviewed AWS AI/ML service portfolio
+  * Studied SageMaker, Rekognition, Comprehend, Kendra capabilities
 
-* Worked with AWS CloudTrail:
-  * Enabled CloudTrail in AWS account
-  * Configured trail to log to S3 bucket
-  * Reviewed API call history
-  * Viewed events in CloudTrail console
-  * Understood log file format
+* Practiced with Amazon SageMaker:
+  * Created Notebook Instance for ML development
+  * Trained simple models (Linear Regression, Image Classification)
+  * Deployed model endpoints for predictions
+  * Tested inference requests to endpoints
+  * Understood SageMaker workflow and pricing
 
-* Practiced with AWS Config:
-  * Enabled AWS Config service
-  * Set up Config rules for compliance:
-    * Check for encrypted EBS volumes
-    * Verify S3 bucket versioning
-    * Check IAM password policy
-  * Reviewed compliance dashboard
-  * Viewed non-compliant resources
+* Worked with Amazon Rekognition:
+  * Implemented face detection and recognition
+  * Tested object and scene detection in images
+  * Analyzed video content for objects and activities
+  * Integrated Rekognition API into web application
+  * Explored use cases for computer vision
+
+* Experimented with NLP services:
+  * Used Amazon Comprehend for sentiment analysis
+  * Extracted key phrases and entities from text
+  * Tested Amazon Kendra for intelligent search
+  * Compared capabilities of different NLP services
+  * Identified real-world applications for AI/ML in business
 
 * Used AWS GuardDuty:
   * Enabled GuardDuty for threat detection

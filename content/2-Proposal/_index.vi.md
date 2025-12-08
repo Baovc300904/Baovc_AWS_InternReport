@@ -29,7 +29,7 @@ Devteria Game Store là nền tảng thương mại điện tử có khả năng
 
 ### 3. Kiến trúc giải pháp
 
-![Kiến trúc Devteria](/static/images/2-Proposal/proposal.jpg)
+![Kiến trúc Devteria](/images/2-Proposal/proposal.jpg)
 
 **Các thành phần chính:**
 - **Frontend**: CloudFront CDN + S3 (ứng dụng React, bộ nhớ đệm toàn cầu, tải <2s)

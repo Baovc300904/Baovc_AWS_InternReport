@@ -12,8 +12,9 @@ pre: " <b> 1.10. </b> "
 
 ### Mục tiêu tuần 10:
 
-* Kết nối, làm quen với các thành viên trong First Cloud Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+* Tìm hiểu các dịch vụ AI/ML trên AWS.
+* Hiểu quy trình machine learning sử dụng các dịch vụ AWS.
+* Thực hành xây dựng và triển khai các mô hình ML với SageMaker và các dịch vụ AI khác.
 
 ### Các công việc cần triển khai trong tuần này:
 | Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
@@ -27,33 +28,30 @@ pre: " <b> 1.10. </b> "
 
 ### Kết quả đạt được tuần 10:
 
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
+* Tìm hiểu về AI/ML trên AWS:
+  * Hiểu các khái niệm machine learning và quy trình làm việc
+  * Xem xét danh mục dịch vụ AI/ML của AWS
+  * Nghiên cứu khả năng của SageMaker, Rekognition, Comprehend, Kendra
 
-* Đã tạo và cấu hình AWS Free Tier account thành công.
+* Thực hành với Amazon SageMaker:
+  * Tạo Notebook Instance để phát triển ML
+  * Huấn luyện các mô hình đơn giản (Linear Regression, Image Classification)
+  * Triển khai các endpoint mô hình để dự đoán
+  * Kiểm tra các inference request đến endpoint
+  * Hiểu quy trình làm việc và giá cả của SageMaker
 
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
+* Làm việc với Amazon Rekognition:
+  * Triển khai nhận dạng và phát hiện khuôn mặt
+  * Kiểm tra phát hiện đối tượng và cảnh trong ảnh
+  * Phân tích nội dung video cho đối tượng và hoạt động
+  * Tích hợp Rekognition API vào ứng dụng web
+  * Khám phá các use case cho computer vision
 
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
-
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
+* Thử nghiệm với các dịch vụ NLP:
+  * Sử dụng Amazon Comprehend để phân tích cảm xúc
+  * Trích xuất các cụm từ chính và thực thể từ văn bản
+  * Kiểm tra Amazon Kendra cho tìm kiếm thông minh
+  * So sánh khả năng của các dịch vụ NLP khác nhau
+  * Xác định ứng dụng thực tế của AI/ML trong doanh nghiệp
 
 

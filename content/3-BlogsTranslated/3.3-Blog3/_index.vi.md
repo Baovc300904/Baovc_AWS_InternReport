@@ -1,6 +1,6 @@
 ---
 title: "Blog 3"
-weight: 3
+weight: 1
 chapter: false
 pre: " <b> 3.3. </b> "
 ---
@@ -8,108 +8,122 @@ pre: " <b> 3.3. </b> "
 ⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
 {{% /notice %}}
 
-# Cách Launchpad từ Pega kích hoạt khả năng mở rộng SaaS an toàn với AWS Lambda
+# Cách Launchpad từ Pega Cho Phép Mở Rộng SaaS An Toàn với AWS Lambda
 
-**Tác giả: Anton Aleksandrov, Giridhar Ramadhenu, Rajesh Kumar Maram, và Anubhav Sharma**  
-**Ngày đăng: 30 tháng 5, 2024**  
-**Danh mục: AWS Lambda, Best Practices, Customer Solutions, Serverless, Technical How-to**
+**Tác giả:** Anton Aleksandrov, Giridhar Ramadhenu, Rajesh Kumar Maram, và Anubhav Sharma  
+**Xuất bản:** 30 THÁNG 5, 2025  
+**Danh mục:** AWS Lambda, Best Practices, Giải Pháp Khách Hàng, Serverless, Hướng Dẫn Kỹ Thuật
 
-## Giới thiệu
+Các tổ chức lớn ngày càng áp dụng các giải pháp phần mềm dưới dạng dịch vụ (SaaS) để tập trung vào các ưu tiên kinh doanh, giảm chi phí quản lý cơ sở hạ tầng và tối ưu hóa chi phí. Các tổ chức này mong đợi các nhà cung cấp SaaS cung cấp khả năng tùy chỉnh để điều chỉnh hành vi giải pháp theo nhu cầu của họ. Mặc dù các phương pháp truyền thống như feature flags và webhooks cung cấp một số tính linh hoạt, chúng thường không đạt được mức độ tùy chỉnh cao. Một mô hình mới nổi trong lĩnh vực này là **thực thi mã tùy chỉnh do tenant cung cấp**, cho phép các tenant inject mã của riêng họ vào các điểm workflow cụ thể, cho phép tùy chỉnh sâu trong khi vẫn bảo toàn tính toàn vẹn và bảo mật của các giải pháp SaaS cốt lõi.
 
-Các tổ chức lớn ngày càng áp dụng các giải pháp phần mềm dưới dạng dịch vụ (SaaS) để tập trung vào các ưu tiên kinh doanh, giảm chi phí quản lý cơ sở hạ tầng và tối ưu hóa chi phí. Những tổ chức này mong đợi các nhà cung cấp SaaS cung cấp khả năng tùy chỉnh để điều chỉnh hành vi giải pháp theo nhu cầu của họ. Mặc dù các phương pháp truyền thống như feature flags và webhooks cung cấp một số tính linh hoạt, chúng thường không đáp ứng được mức độ tùy chỉnh cao. Một pattern mới nổi trong lĩnh vực này là thực thi mã tùy chỉnh do tenant cung cấp, cho phép các tenant đưa mã của riêng họ vào các điểm workflow cụ thể, tạo điều kiện cho việc tùy chỉnh sâu trong khi vẫn bảo tồn tính toàn vẹn và bảo mật của giải pháp SaaS cốt lõi.
-
-Trong bài viết này, chúng tôi chia sẻ cách Pegasystems (Pega) xây dựng Launchpad, nền tảng phát triển SaaS mới của họ, để giải quyết một thách thức cốt lõi trong môi trường multi-tenant: kích hoạt tùy chỉnh khách hàng an toàn. Bằng cách chạy mã tenant trong các môi trường cô lập với AWS Lambda, Launchpad cung cấp cho khách hàng một nền tảng an toàn, có thể mở rộng, loại bỏ nhu cầu tùy chỉnh mã riêng biệt.
-
-## Tổng quan giải pháp
-
-Launchpad, được xây dựng trên AWS, là một nền tảng end-to-end mà các nhà cung cấp phần mềm có thể xây dựng, triển khai và vận hành các ứng dụng SaaS B2B tập trung vào workflow và các giải pháp AI. Nó cung cấp một môi trường cloud được quản lý, an toàn, có thể mở rộng để hosting các ứng dụng và dữ liệu multi-tenant. Nó tăng tốc trải nghiệm xây dựng với các công cụ low code được hỗ trợ bởi generative AI, các khả năng được xây dựng sẵn và cấu hình cấp độ subscriber. Là một nền tảng multi-tenant ở cốt lõi, Launchpad phải duy trì sự cô lập nghiêm ngặt giữa các tenant trong kiến trúc của nó.
-
-Một trong những yêu cầu của Launchpad là cho phép các tenant của họ tăng cường workflows một cách native bằng cách cung cấp mã tùy chỉnh. Một số kịch bản phổ biến bao gồm giao tiếp với các hệ thống bên ngoài có giao thức độc quyền không theo tiêu chuẩn ngành, tái sử dụng logic kinh doanh hiện có, và phát triển mã tùy chỉnh dựa trên SDK.
-
-Giải pháp đòi hỏi khả năng cho các tenant cung cấp mã tùy chỉnh triển khai logic kinh doanh cần thiết, mà Launchpad sẽ thực thi. Điều này đòi hỏi việc thiết kế một môi trường runtime an toàn cho việc thực thi mã tùy chỉnh duy trì mức độ cô lập cross-tenant cao nhất trong kiến trúc multi-tenant, đồng thời cho phép truy cập đầy đủ vào các API và dịch vụ của nền tảng. Việc xây dựng một kiến trúc tách rời môi trường chạy mã tenant khỏi nền tảng SaaS cốt lõi là điều cần thiết, như được minh họa trong sơ đồ sau.
-
-**Kiến trúc tách biệt môi trường thực thi mã tenant khỏi nền tảng SaaS cốt lõi**
-
-## Thiết kế topology giải pháp
-
-Để đạt được mức độ cô lập compute cao cần thiết cho việc chạy mã do các tenant khác nhau cung cấp, Launchpad đã áp dụng các hàm AWS Lambda trong kiến trúc của mình như một môi trường compute ephemeral an toàn. Mỗi đoạn mã không đáng tin cậy được cung cấp bởi tenant được khởi tạo như một hàm Lambda độc lập, với sự cô lập mạnh mẽ dựa trên Firecracker giữa các hàm và môi trường thực thi riêng biệt. Cơ chế này mang lại khả năng phân bổ tài nguyên chuyên dụng, quyền truy cập có thể tùy chỉnh, giám sát và vận hành độc lập, cùng khả năng tự động mở rộng cho từng hàm, đồng thời duy trì sự tách biệt hoàn toàn khỏi các hàm khác và môi trường thực thi của chúng — như được minh họa trong sơ đồ sau.
-
-**Kiến trúc cô lập Lambda functions với Firecracker**
-
-Với Lambda là một dịch vụ serverless compute, việc áp dụng nó cho kiến trúc Launchpad mang lại một số lợi ích đáng kể. Lợi ích kinh doanh chính là các tenant có thể triển khai hàng nghìn tùy chỉnh workflow tự mình chỉ bằng cách cung cấp các đoạn mã, thay vì đội ngũ kỹ thuật Launchpad phải chịu trách nhiệm triển khai chúng trong mã nền tảng cốt lõi. Các lợi ích khác bao gồm:
-
-- **Managed runtimes** – AWS tự động xử lý việc vá lỗi và cập nhật cho cơ sở hạ tầng, hệ điều hành, và runtime, giúp giảm đáng kể bề mặt tấn công tiềm ẩn.
-- **Fine-grained permissions** – Mỗi hàm có thể được gán chính sách truy cập (IAM policy) riêng, cho phép kiểm soát chi tiết đối với tài nguyên và hành động mà hàm được phép thực hiện.
-- **No pre-provisioning or over-provisioning costs** – Lambda tự động mở rộng lên/xuống theo lưu lượng truy cập, giúp loại bỏ nhu cầu dự trữ trước năng lực compute và tránh lãng phí chi phí.
-- **Built-in monitoring** – Các hàm Lambda tự động phát sinh metrics, logs, và traces chi tiết thông qua Amazon CloudWatch và AWS X-Ray, giúp giám sát việc thực thi mã tenant trở nên dễ dàng và minh bạch.
-
-Để giảm thiểu rủi ro bảo mật, Launchpad triển khai các hàm AWS Lambda chứa mã không đáng tin cậy trong một AWS account chuyên dụng, hoàn toàn tách biệt với account nền tảng SaaS cốt lõi. Khi người dùng cuối tạo một hàm mới trong portal authoring của Launchpad, họ tải lên mã nguồn của mình và chỉ định code handler để được thực thi trong quá trình invocation. Người dùng cũng có thể ánh xạ input và output của hàm đến các trường dữ liệu trong Launchpad nhằm xử lý thêm, giúp kích hoạt mức độ tùy chỉnh và tích hợp cao hơn. Dịch vụ authoring multi-tenant này là một thành phần Control Plane, chạy dưới dạng microservice trên cụm Amazon Elastic Kubernetes Service (Amazon EKS) và sử dụng Lambda API để quản lý vòng đời của các hàm Lambda (function lifecycle), như được minh họa trong sơ đồ sau. Sau khi một function resource được tạo, nó có thể được tái sử dụng cho các invocation tiếp theo, giúp đảm bảo hiệu suất và tính cô lập ổn định cho từng tenant.
-
-**Kiến trúc authoring và lifecycle management với Amazon EKS**
-
-## Kiến trúc runtime
-
-Tại runtime, khi Launchpad cần thực thi một hàm, hệ thống sẽ gọi Lambda Invoke API. Trước khi hàm được kích hoạt, dịch vụ runtime multi-tenant thực hiện kiểm tra tenancy để đảm bảo yêu cầu xuất phát từ một tenant được ủy quyền, thông qua quá trình xác thực token. Sau khi xác thực thành công, dịch vụ sẽ invoke hàm Lambda tương ứng. Trong trường hợp các hàm được lưu trữ trong một AWS account khác, dịch vụ runtime multi-tenant sử dụng một AWS Identity and Access Management (IAM) role để assume các quyền cần thiết và thực hiện lời gọi đến AWS Lambda thông qua AWS SDK. Chuỗi tương tác giữa các thành phần trong quá trình này được thể hiện trong sơ đồ kiến trúc sau.
-
-**Kiến trúc runtime và flow invocation với IAM cross-account access**
-
-Workflow bao gồm các bước sau:
-
-1. Yêu cầu user đến sẽ reach dịch vụ application gateway.
-2. Application gateway xác thực yêu cầu bằng dịch vụ tenancy security.
-3. Sau khi được xác thực, yêu cầu được chuyển tiếp đến dịch vụ runtime multi-tenant.
-4. Dịch vụ runtime multi-tenant xác thực token được cung cấp và thực hiện kiểm tra tenancy. Điều này đảm bảo các tenant chỉ có thể invoke các hàm riêng mà họ có quyền (ví dụ: các hàm họ sở hữu).
-5. Pod dịch vụ runtime multi-tenant assume IAM role cần thiết để invoke hàm Lambda tenant-specific trong một AWS account khác.
-6. Pod dịch vụ runtime multi-tenant invoke hàm Lambda cần thiết.
-
-Invoke platform API từ mã tùy chỉnh đơn giản như khi kết nối với bất kỳ external API nào khác. Mã tùy chỉnh có thể xác thực với nền tảng thông qua OAuth2. Để tạo điều kiện cho việc xác thực, developer có thể truyền credentials như các tham số input cho hàm từ nền tảng cốt lõi. Sau đó, developer có thể tạo một record tương ứng (được cô lập bởi tenant) trong nền tảng để lưu trữ credentials cho từng hàm, và truyền các credentials này như tham số input trong quá trình invocation.
-
-## Observability kiến trúc phân tán
-
-Vận hành một kiến trúc phân tán chạy mã không đáng tin cậy qua nhiều AWS accounts đòi hỏi một chiến lược observability toàn diện. Cách tiếp cận của Launchpad kết hợp logging và monitoring tập trung với tổng hợp cross-account để cung cấp một góc nhìn vận hành thống nhất của nền tảng.
-
-Kiến trúc monitoring sử dụng CloudWatch Metrics để quan sát các hàm Lambda, tổng hợp dữ liệu thông qua một lớp observability tập trung. Thiết lập này cho phép các platform operators tương quan metrics của hàm Lambda với các dịch vụ nền tảng cốt lõi chạy trên Amazon EKS. Launchpad cũng thu thập telemetry per-function như số lượng invocations, tỷ lệ lỗi, và thời gian thực thi, cho phép quan sát metrics per-tenant. Những chiều dữ liệu telemetry này cung cấp cả góc nhìn monitoring toàn nền tảng (platform-wide) và góc nhìn cụ thể theo từng tenant (tenant-specific).
-
-Để logging và troubleshooting, Launchpad triển khai một pipeline logging thống nhất tổng hợp logs hàm Lambda với logs application gateway và runtime service. Mỗi yêu cầu chảy qua hệ thống mang một correlation ID, vì vậy các operators có thể theo dõi đường dẫn thực thi qua các dịch vụ SaaS cốt lõi và vào các tenant functions chạy trong AWS account chạy tenant Lambda functions.
-
-Với kiến trúc observability đa tầng (multi-layer) này, Launchpad có thể duy trì hiệu suất vận hành xuất sắc trong khi vẫn đảm bảo an toàn cho việc chạy mã tenant ở quy mô lớn. Các đánh giá vận hành định kỳ thúc đẩy cải tiến liên tục trong phạm vi coverage monitoring và quy trình phản ứng sự cố (incident response). Việc triển khai các hàm Lambda per-tenant cũng cho phép Launchpad sử dụng tags phân bổ chi phí đặc thù cho từng tenant, giúp họ hiểu rõ hơn footprint chi phí của việc chạy mã tùy chỉnh tenant, đồng thời tăng khả năng theo dõi và tối ưu hóa chi phí vận hành trên toàn hệ thống.
-
-## Best practices
-
-Khi xây dựng một giải pháp SaaS, việc duy trì một code base cốt lõi thống nhất là điều cần thiết cho khả năng mở rộng và quản lý. Triển khai các variations per-tenant trong mã nền tảng cốt lõi có thể dẫn đến sự phức tạp trong bảo trì và technical debt. Thay vào đó, hãy thiết kế giải pháp SaaS của bạn có các extension points, cho phép các tenant của bạn đưa mã tùy chỉnh của họ vào các điểm cụ thể trong workflow, kích hoạt tùy chỉnh mà không ảnh hưởng đến khả năng bảo trì của nền tảng. Pattern này đảm bảo nền tảng SaaS cốt lõi vẫn sạch sẽ và được tiêu chuẩn hóa trong khi cung cấp tính linh hoạt mà khách hàng yêu cầu.
-
-Các best practices bổ sung bao gồm:
-
-- Sử dụng các AWS account riêng biệt để chạy các hàm Lambda với mã không đáng tin cậy do tenant cung cấp, nhằm đảm bảo chúng được cô lập hoàn toàn khỏi mã nền tảng SaaS cốt lõi.
-- Cấp quyền truy cập tối thiểu cần thiết (principle of least privilege) cho execution role được gán cho hàm. Mã tùy chỉnh chạy trong môi trường thực thi chỉ nên có quyền được định nghĩa trong execution role khi gọi đến AWS API endpoints. Nếu hàm không cần truy cập AWS API, hãy xóa tất cả quyền khỏi execution role và thêm một chính sách AWSDenyAll rõ ràng.
-- Sử dụng các hàm Lambda riêng biệt cho từng đoạn mã và từng tenant, đảm bảo mức độ cô lập cross-tenant cao nhất. Không tái sử dụng tài nguyên hoặc môi trường thực thi giữa các hàm khác nhau.
-- Sử dụng Lambda layers trong trường hợp cần thêm lớp mã do vendor cung cấp, giúp tách biệt hoàn toàn với mã không đáng tin cậy từ tenant.
-- Triển khai các kiểm soát bảo mật bổ sung, chẳng hạn như sử dụng Amazon Virtual Private Cloud (Amazon VPC) để hạn chế truy cập mạng, và VPC Flow Logs để giám sát lưu lượng và hoạt động mạng.
-
-## Kết luận
-
-Việc triển khai một môi trường thực thi mã không đáng tin cậy an toàn trong các nền tảng SaaS giải quyết một nhu cầu quan trọng cho tùy chỉnh tenant trong khi duy trì tính toàn vẹn kiến trúc. AWS Lambda cung cấp một mô hình cô lập tích hợp, kiểm soát bảo mật fine-grained, và khả năng mở rộng serverless, cho phép các nhà cung cấp SaaS như Launchpad giải quyết yêu cầu thực thi mã do tenant cung cấp trong môi trường multi-tenant, đồng thời cung cấp khả năng tùy chỉnh mạnh mẽ trong khi vẫn duy trì ranh giới bảo mật nghiêm ngặt và hiệu quả vận hành.
-
-Mẫu pattern kiến trúc này cho phép các nhà cung cấp SaaS tập trung vào phát triển nền tảng cốt lõi, trong khi vẫn tự tin hỗ trợ các workflows tenant-specific thông qua môi trường thực thi Lambda an toàn và có thể mở rộng.
-
-Để tìm hiểu thêm, hãy tham khảo white paper Security Overview of AWS Lambda. Để biết thêm các mẫu kiến trúc serverless, hãy xem Serverlessland.com.
-
-## Về các tác giả
-
-**Anton Aleksandrov**  
-Anton là Principal Solutions Architect chuyên về AWS Serverless và kiến trúc Event-Driven. Với hơn hai thập kỷ kinh nghiệm về kỹ thuật và kiến trúc, anh làm việc với các khách hàng ISV và SaaS lớn để thiết kế các giải pháp đám mây có khả năng mở rộng cao, sáng tạo và an toàn.
-
-**Giridhar Ramadhenu**  
-Giridhar là một Software Architect dày dạn kinh nghiệm với hơn hai thập kỷ chuyên môn trong ngành, chuyên về nhiều phong cách kiến trúc như microservices, event-driven và layered architectures. Là Fellow Software Architect cho Launchpad tại Pegasystems và thành viên chủ chốt của Architecture Guild, Giridhar đóng vai trò then chốt trong việc định hình kiến trúc của các sản phẩm khác nhau. Những đóng góp của anh bao trùm toàn bộ technology stack — từ AWS và cơ sở hạ tầng cloud dựa trên Kubernetes đến các lĩnh vực trọng yếu như tích hợp API, dữ liệu, quản lý case và bảo mật.
-
-**Rajesh Kumar Maram**  
-Rajesh Kumar Maram là Senior Principal Software Engineer cho Launchpad tại Pegasystems, với hơn một thập kỷ kinh nghiệm trong ngành. Anh dẫn dắt việc giải quyết các thách thức kỹ thuật phức tạp và thúc đẩy đổi mới thông qua các giải pháp sáng tạo. Rajesh đam mê khám phá các công nghệ mới nổi và đánh giá khả năng áp dụng của chúng cho các use case kinh doanh của Pega. Anh đã thử nghiệm và tích hợp nhiều dịch vụ AWS vào các microservices khác nhau trong Launchpad.
-
-**Anubhav Sharma**  
-Anubhav Sharma là Principal Solutions Architect tại AWS với hơn hai thập kỷ kinh nghiệm trong việc lập trình và thiết kế các ứng dụng business-critical. Được biết đến với niềm đam mê học hỏi và đổi mới, Anubhav đã dành sáu năm qua tại AWS làm việc chặt chẽ với nhiều independent software vendors (ISVs) và doanh nghiệp. Anh chuyên hướng dẫn các tổ chức này trong hành trình xây dựng, triển khai và vận hành các giải pháp SaaS trên AWS.
-
-**TAGS:** AWS Lambda, Serverless, SaaS Architecture, Multi-tenancy, Security
+Trong bài viết này, chúng tôi chia sẻ cách **Pegasystems (Pega)** xây dựng **Launchpad**, nền tảng phát triển SaaS mới của họ, để giải quyết một thách thức cốt lõi trong môi trường multi-tenant: cho phép tùy chỉnh khách hàng an toàn. Bằng cách chạy mã tenant trong các môi trường cô lập với AWS Lambda, Launchpad cung cấp cho khách hàng của mình một nền tảng an toàn, có khả năng mở rộng, loại bỏ nhu cầu tùy chỉnh mã bespoke.
 
 ---
 
-*Bài viết gốc: How Launchpad from Pega enables secure SaaS extensibility with AWS Lambda*
+## Tổng Quan Giải Pháp
+
+Launchpad, được xây dựng trên AWS, là một nền tảng end-to-end mà trên đó các nhà cung cấp phần mềm có thể xây dựng, khởi chạy và vận hành các ứng dụng SaaS B2B tập trung vào workflow và các giải pháp AI. Nó cung cấp một môi trường cloud được quản lý, an toàn, có khả năng mở rộng để lưu trữ các ứng dụng và dữ liệu multi-tenant. Nó tăng tốc trải nghiệm xây dựng với các công cụ low code được hỗ trợ bởi generative AI, các khả năng được xây dựng sẵn và cấu hình cấp độ subscriber. Là một nền tảng multi-tenant ở cốt lõi, Launchpad phải duy trì sự cô lập nghiêm ngặt giữa các tenant trong kiến trúc của nó.
+
+Một trong những yêu cầu của Launchpad là cho phép các tenant của họ tăng cường workflow một cách tự nhiên bằng cách cung cấp mã tùy chỉnh. Một số kịch bản phổ biến bao gồm:
+- Giao tiếp với các hệ thống bên ngoài với các giao thức độc quyền không tuân theo tiêu chuẩn ngành
+- Tái sử dụng logic nghiệp vụ hiện có
+- Phát triển mã tùy chỉnh dựa trên SDK
+
+Giải pháp đòi hỏi khả năng cho các tenant cung cấp mã tùy chỉnh sẽ triển khai logic nghiệp vụ cần thiết, mà Launchpad sẽ thực thi. Điều này đòi hỏi thiết kế một môi trường runtime an toàn cho việc thực thi mã tùy chỉnh duy trì mức độ cô lập cross-tenant cao nhất trong kiến trúc multi-tenant, đồng thời cho phép truy cập đầy đủ vào các API và dịch vụ của nền tảng. Điều cần thiết là xây dựng một kiến trúc tách biệt môi trường chạy mã tenant khỏi nền tảng SaaS cốt lõi.
+
+---
+
+## Thiết Kế Topology Giải Pháp
+
+Để đạt được mức độ cô lập compute cao cần thiết để chạy mã được cung cấp bởi các tenant khác nhau, Launchpad đã áp dụng **Lambda functions** trong kiến trúc của nó như một môi trường compute ephemeral an toàn. Mỗi đoạn mã không đáng tin cậy được cung cấp bởi các tenant được bootstrap như một Lambda function độc lập, với **sự cô lập dựa trên Firecracker** mạnh mẽ giữa các function khác nhau và các môi trường thực thi đáp ứng các yêu cầu của Launchpad. Sự cô lập này cung cấp:
+- Tài nguyên chuyên dụng
+- Quyền truy cập có thể tùy chỉnh
+- Giám sát và vận hành độc lập
+- Tự động scaling cho mỗi function
+- Tách biệt hoàn toàn khỏi các function khác và môi trường thực thi của chúng
+
+Với Lambda là một dịch vụ compute serverless, việc áp dụng nó cho kiến trúc Launchpad mang lại một số lợi ích đáng kể:
+
+**Lợi Ích Kinh Doanh Chính:** Các tenant có thể triển khai hàng nghìn tùy chỉnh workflow của riêng họ chỉ bằng cách cung cấp các đoạn mã, thay vì đội ngũ kỹ thuật Launchpad phải chịu trách nhiệm triển khai chúng trong mã nền tảng cốt lõi.
+
+**Lợi Ích Kỹ Thuật:**
+- **Managed runtimes** – AWS xử lý patching và cập nhật cơ sở hạ tầng cơ bản, hệ điều hành và runtime cho khách hàng, giảm bề mặt tấn công tiềm năng
+- **Fine-grained permissions** – Mỗi function có thể có bộ access policies riêng để kiểm soát chặt chẽ những tài nguyên và hành động mà nó có thể truy cập
+- **Không cần pre-provision và trả tiền cho overprovisioned capacity** – Lambda functions tự động scale up và down dựa trên các mô hình traffic
+- **Built-in monitoring** – Lambda functions phát ra các metric, log và trace chi tiết thông qua Amazon CloudWatch và AWS X-Ray ngay từ đầu, giúp dễ dàng giám sát việc thực thi mã tenant
+
+Để giảm thêm rủi ro, Launchpad chạy các Lambda functions này với mã không đáng tin cậy trong một **AWS account chuyên dụng**, tách biệt khỏi account nền tảng SaaS cốt lõi. Khi người dùng cuối tạo một function mới trong cổng authoring Launchpad, họ tải lên mã của mình và chỉ định code handler sẽ được thực thi trong quá trình invocation. Người dùng cũng có thể ánh xạ input và output của function sang các trường Launchpad để xử lý thêm nhằm cho phép mức độ tùy chỉnh và tích hợp cao hơn.
+
+Dịch vụ authoring multi-tenant là một component Control Plane chạy như một microservice trên cluster **Amazon Elastic Kubernetes Service (Amazon EKS)** và sử dụng Lambda API để quản lý vòng đời function. Sau khi một tài nguyên function được tạo, nó có thể được sử dụng cho các invocation tiếp theo.
+
+---
+
+## Kiến Trúc Runtime
+
+Tại runtime, khi Launchpad cần gọi một function, nó gọi Lambda Invoke API. Trước khi function được gọi, dịch vụ runtime multi-tenant thực hiện **kiểm tra tenancy** để đảm bảo request đến từ một tenant được ủy quyền bằng cách thực hiện xác thực token. Sau khi xác thực thành công, dịch vụ gọi Lambda function cần thiết. Để gọi các function được lưu trữ trong một AWS account khác, dịch vụ runtime multi-tenant sử dụng một **AWS Identity and Access Management (IAM) role** để assume các quyền cần thiết và gọi dịch vụ Lambda bằng AWS SDK.
+
+**Workflow bao gồm các bước sau:**
+
+1. Một request người dùng đến service application gateway
+2. Application gateway xác thực request bằng dịch vụ bảo mật tenancy
+3. Sau khi được xác thực, request được chuyển tiếp đến dịch vụ runtime multi-tenant
+4. Dịch vụ runtime multi-tenant xác thực token được cung cấp và thực hiện kiểm tra tenancy (đảm bảo các tenant chỉ có thể gọi các function riêng của họ mà họ có quyền)
+5. Pod dịch vụ runtime multi-tenant assume IAM role cần thiết để gọi Lambda function cụ thể của tenant trong một AWS account khác
+6. Pod dịch vụ runtime multi-tenant gọi Lambda function cần thiết
+
+Việc gọi platform API từ mã tùy chỉnh đơn giản như kết nối với bất kỳ external API nào. Mã tùy chỉnh có thể xác thực với nền tảng bằng **OAuth2**. Để tạo điều kiện thuận lợi cho việc xác thực, developer có thể truyền credentials như các tham số input cho function từ nền tảng cốt lõi. Sau đó, developer có thể tạo một bản ghi tương ứng (được cô lập bởi tenant) trong nền tảng lưu trữ credentials cho mỗi function, và truyền credentials như các tham số input trong quá trình invocation.
+
+---
+
+## Khả Năng Quan Sát Kiến Trúc Phân Tán
+
+Vận hành một kiến trúc phân tán chạy mã không đáng tin cậy trên nhiều AWS account đòi hỏi một chiến lược observability toàn diện. Cách tiếp cận của Launchpad kết hợp logging và monitoring tập trung với aggregation cross-account để cung cấp một cái nhìn vận hành thống nhất về nền tảng.
+
+Kiến trúc monitoring sử dụng **CloudWatch Metrics** để quan sát các Lambda functions, tổng hợp chúng thông qua một lớp observability tập trung. Thiết lập này cho phép các nhà vận hành nền tảng tương quan các metric của Lambda function với các dịch vụ nền tảng cốt lõi chạy trên Amazon EKS. Launchpad cũng thu thập telemetry theo function như:
+- Function invocations
+- Error rates
+- Execution time
+
+Các dimension telemetry này cho phép cả góc nhìn monitoring toàn nền tảng và cụ thể theo tenant.
+
+Đối với logging và troubleshooting, Launchpad triển khai một pipeline logging thống nhất tổng hợp các log Lambda function với các log application gateway và runtime service. Mỗi request chảy qua hệ thống mang một **correlation ID**, vì vậy các nhà vận hành có thể trace các đường dẫn thực thi qua các dịch vụ SaaS cốt lõi và vào các tenant function chạy trong AWS account chạy các tenant Lambda functions.
+
+Với kiến trúc observability đa lớp này, Launchpad có thể duy trì sự xuất sắc trong vận hành trong khi chạy mã tenant một cách an toàn ở quy mô lớn. Các đánh giá vận hành thường xuyên thúc đẩy cải tiến liên tục trong coverage monitoring và các quy trình phản hồi sự cố. Việc có các Lambda functions theo tenant cho phép Launchpad sử dụng **tenant-specific cost allocation tags**, hỗ trợ thêm việc hiểu chi phí vận hành mã tùy chỉnh của tenant.
+
+---
+
+## Best Practices
+
+Khi xây dựng một giải pháp SaaS, việc duy trì một codebase cốt lõi thống nhất là điều cần thiết cho khả năng mở rộng và quản lý. Việc triển khai các biến thể theo tenant trong mã nền tảng cốt lõi có thể dẫn đến độ phức tạp bảo trì và technical debt. Thay vào đó, hãy thiết kế giải pháp SaaS của bạn để có **extension points**, cho phép các tenant của bạn inject mã tùy chỉnh của họ tại các điểm cụ thể trong workflow, cho phép tùy chỉnh mà không làm tổn hại đến khả năng bảo trì của nền tảng. Mô hình này đảm bảo nền tảng SaaS cốt lõi vẫn sạch và được tiêu chuẩn hóa trong khi cung cấp tính linh hoạt mà khách hàng yêu cầu.
+
+**Các best practice bổ sung bao gồm:**
+
+1. **Sử dụng các account riêng biệt** để chạy các Lambda functions với mã không đáng tin cậy do tenant cung cấp để đảm bảo nó được cô lập khỏi mã nền tảng SaaS cốt lõi của bạn
+2. **Cấp quyền truy cập tối thiểu tuyệt đối cần thiết** cho execution role được gán cho function. Mã tùy chỉnh chạy trong môi trường thực thi nhận được các quyền được định nghĩa trong execution role khi thực hiện request đến các AWS API endpoint. Nếu function không cần reach out đến AWS API endpoint, hãy xóa tất cả các quyền khỏi execution role và thêm một policy AWSDenyAll rõ ràng
+3. **Sử dụng các Lambda functions riêng biệt** cho mỗi đoạn mã và mỗi tenant. Điều này sẽ cung cấp mức độ cô lập cross-tenant cao nhất. Tài nguyên không được tái sử dụng giữa các function khác nhau và môi trường thực thi
+4. **Sử dụng Lambda layers** trong trường hợp bạn cần thêm một lớp mã do vendor cung cấp để giữ nó tách biệt khỏi mã không đáng tin cậy do tenant cung cấp
+5. **Triển khai các security control bổ sung**, chẳng hạn như sử dụng các cấu trúc Amazon Virtual Private Cloud (Amazon VPC) để hạn chế truy cập mạng và VPC Flow Logs để giám sát hoạt động mạng
+
+---
+
+## Kết Luận
+
+Việc triển khai một môi trường thực thi mã không đáng tin cậy an toàn trong các nền tảng SaaS giải quyết một nhu cầu quan trọng về tùy chỉnh tenant trong khi duy trì tính toàn vẹn kiến trúc. Lambda cung cấp một mô hình cô lập tích hợp sẵn, các security control chi tiết và khả năng mở rộng serverless, vì vậy các nhà cung cấp SaaS như Launchpad có thể giải quyết các yêu cầu thực thi mã do tenant cung cấp trong môi trường multi-tenant và cung cấp khả năng tùy chỉnh mạnh mẽ trong khi duy trì ranh giới bảo mật nghiêm ngặt và hiệu quả vận hành.
+
+Mô hình kiến trúc này cho phép các nhà cung cấp tập trung vào phát triển nền tảng cốt lõi trong khi tự tin hỗ trợ các workflow cụ thể của tenant thông qua môi trường thực thi Lambda an toàn và có khả năng mở rộng.
+
+**Để tìm hiểu thêm:**
+- Security Overview of AWS Lambda white paper
+- Các mẫu kiến trúc serverless tại Serverlessland.com
+
+---
+
+## Về Các Tác Giả
+
+**Anton Aleksandrov** - Principal Solutions Architect cho AWS Serverless và Event-Driven architectures. Với hơn hai thập kỷ kinh nghiệm kỹ thuật và kiến trúc thực tế, Anton làm việc với các khách hàng ISV và SaaS lớn để thiết kế các giải pháp cloud có khả năng mở rộng cao, sáng tạo và an toàn.
+
+**Giridhar Ramadhenu** - Software architect dày dạn kinh nghiệm với hơn 2 thập kỷ chuyên môn, chuyên về microservices, event-driven và layered architectures. Là Fellow Software Architect cho Launchpad tại Pegasystems và một thành viên có ảnh hưởng của Architecture Guild, Giridhar đóng vai trò then chốt trong việc định hình kiến trúc của nhiều sản phẩm khác nhau.
+
+**Rajesh Kumar Maram** - Senior Principal Software Engineer cho Launchpad tại Pegasystems với hơn một thập kỷ kinh nghiệm. Anh ấy dẫn dắt với sự đổi mới trong việc giải quyết các vấn đề thách thức và khám phá các công nghệ AWS mới nhất cho các use case kinh doanh Pega.
+
+**Anubhav Sharma** - Principal Solutions Architect tại AWS với hơn 2 thập kỷ kinh nghiệm trong việc coding và thiết kế các ứng dụng quan trọng cho kinh doanh. Anh ấy chuyên hướng dẫn các ISV và doanh nghiệp trong hành trình xây dựng, triển khai và vận hành các giải pháp SaaS trên AWS.
