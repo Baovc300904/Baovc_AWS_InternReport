@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Downloading...</title>
+    <script>
+        window.onload = function() {
+            // Force download using absolute path
+            window.location.href = window.location.origin + '/workshop-template/downloads/AWS_Project_Plan_Devteria.docx';
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Calibri', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .message {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        h1 { color: #003366; }
+        .icon { font-size: 64px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="message">
+        <div class="icon">⏳</div>
+        <h1>Starting Download...</h1>
+        <p>Please wait...</p>
+    </div>
+</body>
+</html>
